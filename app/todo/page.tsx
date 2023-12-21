@@ -6,6 +6,7 @@ import readUserSession from "@/lib/action";
 import { redirect } from "next/navigation";
 
 export default async function Page() {
+  // Membuat variabel todos yang berisi array dari objek-objek todo
   const todos = [
     {
       title: "Subscribe",
@@ -14,9 +15,9 @@ export default async function Page() {
       completed: false,
     },
   ];
-
+  // Membuat variabel data yang menyimpan hasil dari fungsi readUserSession
   const { data } = await readUserSession();
-
+  // Jika data.session tidak ada, berarti pengguna belum masuk
   if (!data.session) {
     return redirect("/auth-server-action");
   }
@@ -25,7 +26,8 @@ export default async function Page() {
     <div className="flex justify-center items-center h-screen">
       <div className="w-96 space-y-5">
         <CreateForm />
-
+        {/* // Menggunakan metode map untuk mengulang setiap elemen dari variabel */}
+        todos
         {todos?.map((todo, index) => {
           return (
             <div key={index} className="flex items-center gap-6">
