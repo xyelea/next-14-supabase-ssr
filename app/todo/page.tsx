@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import readUserSession from "@/lib/action";
 import { redirect } from "next/navigation";
+import SignOut from "./components/SignOut";
 
 export default async function Page() {
   // Membuat variabel todos yang berisi array dari objek-objek todo
@@ -25,6 +26,7 @@ export default async function Page() {
   return (
     <div className="flex justify-center items-center h-screen">
       <div className="w-96 space-y-5">
+        <SignOut />
         <CreateForm />
         {/* // Menggunakan metode map untuk mengulang setiap elemen dari variabel */}
         todos

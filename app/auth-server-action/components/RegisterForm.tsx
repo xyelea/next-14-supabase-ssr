@@ -25,6 +25,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 // Mengimpor fungsi signUpWithEmailAndPassword dari direktori lokal
 import { signUpWithEmailAndPassword } from "../actions";
+import { useTransition } from "react";
 // Membuat skema validasi form dengan menggunakan zod
 const FormSchema = z
   .object({
@@ -45,6 +46,7 @@ const FormSchema = z
     path: ["confirm"],
   });
 export default function RegisterForm() {
+  const [isPending, startTransition] = useTransition();
   // Membuat form dengan menggunakan useForm hook
   const form = useForm<z.infer<typeof FormSchema>>({
     // Menggunakan zodResolver untuk validasi form berdasarkan skema
@@ -57,33 +59,35 @@ export default function RegisterForm() {
     },
   });
   // Fungsi untuk menangani submit form
-  async function onSubmit(data: z.infer<typeof FormSchema>) {
-    // Memanggil fungsi signUpWithEmailAndPassword dengan data form
-    const result = await signUpWithEmailAndPassword(data);
-    // Mengurai hasil menjadi objek JSON
-    const { error } = JSON.parse(result);
-    // Jika ada error, menampilkan toast dengan pesan error
-    if (error?.message) {
-      toast({
-        variant: "destructive",
-        title: "You submitted the following values:",
-        description: (
-          <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-            <code className="text-white">{error.message}</code>
-          </pre>
-        ),
-      });
-    } else {
-      // Jika tidak ada error, menampilkan toast dengan pesan sukses
-      toast({
-        title: "You submitted the following values:",
-        description: (
-          <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-            <code className="text-white">Pendaftaran berhasil</code>
-          </pre>
-        ),
-      });
-    }
+  function onSubmit(data: z.infer<typeof FormSchema>) {
+    startTransition(async () => {
+      // Memanggil fungsi signUpWithEmailAndPassword dengan data form
+      const result = await signUpWithEmailAndPassword(data);
+      // Mengurai hasil menjadi objek JSON
+      const { error } = JSON.parse(result);
+      // Jika ada error, menampilkan toast dengan pesan error
+      if (error?.message) {
+        toast({
+          variant: "destructive",
+          title: "You submitted the following values:",
+          description: (
+            <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
+              <code className="text-white">{error.message}</code>
+            </pre>
+          ),
+        });
+      } else {
+        // Jika tidak ada error, menampilkan toast dengan pesan sukses
+        toast({
+          title: "You submitted the following values:",
+          description: (
+            <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
+              <code className="text-white">Pendaftaran berhasil</code>
+            </pre>
+          ),
+        });
+      }
+    });
   }
 
   return (
@@ -148,7 +152,9 @@ export default function RegisterForm() {
         />
         <Button type="submit" className="w-full flex gap-2">
           Register
-          <AiOutlineLoading3Quarters className={cn("animate-spin")} />
+          <AiOutlineLoading3Quarters
+            className={cn("animate-spin", { hidden: !isPending })}
+          />
         </Button>
       </form>
     </Form>
